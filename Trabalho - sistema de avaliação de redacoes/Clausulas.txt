@@ -1,0 +1,4 @@
+CLAUSULAS SQL DO PROGRAMA
+
+CREATE VIEW db_redacoes.REDACOESPARACOMENTAR AS (SELECT usuario.NOME, redacao.idREDACAO, TEMA, TEXTO, DATA 
+FROM db_redacoes.redacao, db_redacoes.usuario WHERE redacao.idUSUARIO = usuario.idUSUARIO);
