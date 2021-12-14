@@ -1,5 +1,6 @@
+from typing import Sized
 from Usuario import Usuario
-from tkinter import *
+from tkinter import * 
 from tkinter import messagebox
 import funcoesBD
 from tkinter import ttk
@@ -114,6 +115,10 @@ class App:
         # ABA INICIAL
         Label(frameUser, fg = self.corfg, text = 'Usuário:', bg = self.cor, font = self.config).pack(pady = 20)
         Label(frameUser, text = f'{self.user.getName()}', bg = self.cor, font = (self.fonte, '20')).pack(pady = (0,20))
+        valor = self.calcRedacoes()
+
+        valores = Label(frameUser, text = f"REDAÇÕES FEITAS: {valor[0]}      |      COMPARAÇÃO COM O SISTEMA: {valor[1]}%", bg = self.cor, font = self.config)
+        valores.pack(pady = 10)
 
         Label(frameUser, text = '+―――――――――――――――――――――――――――――――――――――――――――――――――――――――+', bg = self.cor).pack(pady = 10)
 
@@ -129,6 +134,10 @@ class App:
         self.updatePass2.pack()
         self.updateButton = Button(frameUser, text = 'Atualizar', command = self.atualizarSenha, font = self.config)
         self.updateButton.pack(pady = 20)
+
+        Label(frameUser, text = '+―――――――――――――――――――――――――――――――――――――――――――――――――――――――+', bg = self.cor).pack(pady = 10)
+
+        Button(frameUser, text = "Excluir Conta", command = self.deletarConta).pack(pady = 10)
 
         # ABA DE ESCRITA DAS REDAÇÕES
         Label(frameEscrever, text = 'Escreva sua redação!', bg = self.cor, font = self.config2, fg = self.corfg).pack(pady = 20)
@@ -176,8 +185,7 @@ class App:
         frameSelectC = Frame(self.frameComentar, bg = self.cor)
         frameSelectC.pack(padx = (0,300))
         Label(self.frameComentar, text = 'Para comentar uma redação, clique nela.', bg = self.cor, font = self.config, fg = self.corfg).pack(pady = 10)
-        updateReds = Button(self.frameComentar, text = 'Atualizar redações', command = self.mostrarRedacoes, font = self.config)
-        updateReds.pack(pady = 20)
+
 
         # FRAME DE LISTAGEM DAS REDAÇÕES PARA COMENTAR
         self.listRedacoesC = Frame(self.frameComentar, bg = self.cor)
@@ -256,6 +264,7 @@ class App:
                     data = str(y[3]).split('-')
                     texto.insert(END, f'\n\n\nAssunto: {y[1]} \n\n{y[2]} \n\nData: {data[2]}/{data[1]}/{data[0]} {y[3]}  {y[4]}\n\n')
                     texto.insert(END, '{:^100s}'.format('----------------------------------------------------------------------------------------'))
+        self.master.geometry()
 
     def enviarComentario(self, idRedacao):
         self.coment = Tk()
@@ -276,7 +285,26 @@ class App:
             else:
                 messagebox.showerror('Comentário não enviado', 'Seu comentário não pôde ser enviado. Por favor, tente novamente mais tarde.')
 
+    def deletarConta(self):
+
+            funcoesBD.deletar(self.user.getId())
+            messagebox.showinfo('Conta Excluída', 'Que pena! :( Sua conta acaba de ser excluída. Caso queira voltar a utilizar nosso APP, estamos aqui lhe aguardando, Ok?')
+            self.master.forget()
+    
+            messagebox.showinfo('Conta não Excluida', 'Sua conta não pôde ser excluída.')
+
+    def calcRedacoes(self):
+        try:
+            dados = funcoesBD.contarRedacoes(self.user.getId())
+            porcent = (dados[1] * 100) / dados[0]
+            calc = [dados[1], porcent]
+            return calc
+        except:
+            return (0,0)
+            
+
 if __name__ == '__main__':
     root = Tk()
+    root.title("Free Redações")
     App(root)
     root.mainloop()

@@ -1,5 +1,7 @@
 import mysql.connector
+from mysql.connector import cursor
 
+# INSERT DE USUARIOS
 def inserirUsuario(nome,senha):
     con = mysql.connector.connect(host = 'localhost', database = 'db_redacoes', user = 'root', password = 'jean6032')
     comando = '''INSERT INTO usuario 
@@ -12,6 +14,7 @@ def inserirUsuario(nome,senha):
     cursor.close()
     con.close()   
 
+# SELECT DE DADOS DO USUARIO
 def retornarUsuario(nome):
     try:
         con = mysql.connector.connect(host = 'localhost', database = 'db_redacoes', user = 'root', password = 'jean6032')
@@ -22,6 +25,7 @@ def retornarUsuario(nome):
     except:
         return 0
 
+# UPDATE DE SENHA
 def atualizarSenha(userName, newSenha):
     try:
         con = mysql.connector.connect(host = 'localhost', database = 'db_redacoes', user = 'root', password = 'jean6032')
@@ -33,6 +37,7 @@ def atualizarSenha(userName, newSenha):
     except:
         return 0
 
+# INSERT DE REDAÇÃO
 def inserirRedacao(idUser, data, tema, texto):
     try:
         con = mysql.connector.connect(host = 'localhost', database = 'db_redacoes', user = 'root', password = 'jean6032')
@@ -47,7 +52,7 @@ def inserirRedacao(idUser, data, tema, texto):
     except:
         return 0
 
-
+# SELECT DE REDAÇÕES E COMENTÁRIOS
 def retornarRedacoesEComents(userId, modo):
     if modo == 'TEMA':
         ordem = ''
@@ -69,6 +74,7 @@ def retornarRedacoesEComents(userId, modo):
     except:
         return 0
 
+# SELECT DE REDAÇÕES PARA COMENTAR
 def retornarRedacoes(userId):
 
     con = mysql.connector.connect(host = 'localhost', database = 'db_redacoes', user = 'root', password = 'jean6032')
@@ -79,6 +85,7 @@ def retornarRedacoes(userId):
     cursor.execute(comando)
     return cursor.fetchall()
 
+# INSERT DE COMENTÁRIOS
 def enviarComentario(redId, userId, assunto, texto, data, hora):
     try:
         con = mysql.connector.connect(host = 'localhost', database = 'db_redacoes', user = 'root', password = 'jean6032')
@@ -93,6 +100,24 @@ def enviarComentario(redId, userId, assunto, texto, data, hora):
     except:
         return 0
 
+# DELETE USUÁRIO
+def deletar(idUser):
+    con = mysql.connector.connect(host = 'localhost', database = 'db_redacoes', user = 'root', password = 'jean6032')
+    cursor = con.cursor()
+    cursor.execute('''DELETE FROM usuario WHERE (idUSUARIO = '{}');'''.format(idUser))
+    con.commit()
+
+# CONSULTA DE QUANTIDADE DE REDAÇÕES E PORCENTAGEM
+def contarRedacoes(idUser):
+    con = mysql.connector.connect(host = 'localhost', database = 'db_redacoes', user = 'root', password = 'jean6032')
+    cursor = con.cursor()
+    cursor.execute('''SELECT quantiaredacoes.QUANTIA, count(redacao.idREDACAO) 
+                      FROM db_redacoes.redacao, db_redacoes.usuario, db_redacoes.quantiaredacoes 
+                      WHERE redacao.idUSUARIO = usuario.idUSUARIO AND usuario.idUSUARIO = '{}' GROUP BY usuario.idUSUARIO;'''.format(idUser))
+    return cursor.fetchall()[0]
+
+    
+
 if __name__ == '__main__':
     # id = inserirUsuario('jonas', 'csk98u9')
     # print(retornarUsuario('jean'))
@@ -106,4 +131,4 @@ if __name__ == '__main__':
     for x in retornaRedacoesNoComents('2'):
         print(x)'''
     
-    print(enviarComentario('3', '1', 'Bom dia!', 'Bom dia. Gostei da sua redação!', '2021-10-30', '22:16'))
+    print(contarRedacoes('10'))
